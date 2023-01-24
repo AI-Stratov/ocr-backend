@@ -6,11 +6,9 @@ import time
 from jinja2 import Environment, FileSystemLoader
 import os
 import imghdr
-import torch
-
 
 app = FastAPI()
-reader = easyocr.Reader(["en"], "model\english_g2.pth")
+reader = easyocr.Reader(["en"], gpu=False)
 start_time = time.time()
 
 @app.post("/image/")
@@ -30,7 +28,6 @@ async def image(file: UploadFile, x: int, y: int, width: int, height: int):
     text = process_images(x, y, width, height, image_path)
     return {"text": text}
 
-
 def process_images(x: int, y: int, width: int, height: int, image_path: str) -> str:
     crop_image(image_path, "prepared_data\image.jpg", x, y, width, height)
     text = reader.readtext(f"prepared_data\image.jpg", detail=0)
@@ -41,16 +38,13 @@ def process_images(x: int, y: int, width: int, height: int, image_path: str) -> 
     print("Elapsed time: ", elapsed_time)
     return text
 
-
 def crop_image(image_path, new_file_path, x, y, width, height):
     with Image.open(image_path) as image:
         cropped_image = image.crop((x, y, x + width, y + height))
         cropped_image.save(new_file_path)
 
-
 def is_valid_image(file):
     return imghdr.what(file) in ["jpeg", "png", "bmp", "webp"]
-
 
 @app.get("/")
 async def main():
