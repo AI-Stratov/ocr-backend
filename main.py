@@ -6,6 +6,8 @@ import time
 from jinja2 import Environment, FileSystemLoader
 import os
 import imghdr
+import torch
+
 
 app = FastAPI()
 reader = easyocr.Reader(["en"], "model\english_g2.pth")
