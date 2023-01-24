@@ -1,0 +1,4 @@
+mmr x=1050, y=120, width=50, height=50:
+queue x=800, y=470, width=25, height=25):
+conduct x=345, y=540, width=50, height=25):
+lvl x=925, y=275, width=75, height=50):

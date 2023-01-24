@@ -1,0 +1,32 @@
+<form id="image-form" enctype="multipart/form-data" method="post">
+    <input name="file" type="file">
+    <br>
+    <label for="x">X:</label>
+    <input name="x" type="number" min="0">
+    <br>
+    <label for="y">Y:</label>
+    <input name="y" type="number" min="0">
+    <br>
+    <label for="width">Width:</label>
+    <input name="width" type="number" min="0">
+    <br>
+    <label for="height">Height:</label>
+    <input name="height" type="number" min="0">
+    <br>
+    <br>
+    <input type="submit" value="Upload">
+</form>
+
+<script>
+    const form = document.getElementById("image-form");
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const x = form.elements.x.value;
+        const y = form.elements.y.value;
+        const width = form.elements.width.value;
+        const height = form.elements.height.value;
+        const url = `/image/?x=${x}&y=${y}&width=${width}&height=${height}`;
+        form.action = url;
+        form.submit();
+    });
+</script>
