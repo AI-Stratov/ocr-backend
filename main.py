@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, HTTPException
+from fastapi import FastAPI, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 import easyocr
 from PIL import Image
@@ -8,7 +8,7 @@ import os
 import imghdr
 
 app = FastAPI()
-reader = easyocr.Reader(["en"], "en")
+reader = easyocr.Reader(["en"], "model\english_g2.pth")
 start_time = time.time()
 
 @app.post("/image/")
