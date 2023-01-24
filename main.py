@@ -11,7 +11,6 @@ app = FastAPI()
 reader = easyocr.Reader(["en"], "en")
 start_time = time.time()
 
-
 @app.post("/image/")
 async def image(file: UploadFile, x: int, y: int, width: int, height: int):
     global start_time
