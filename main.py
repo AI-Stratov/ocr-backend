@@ -1,4 +1,3 @@
-from io import BytesIO
 from fastapi import FastAPI, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 import easyocr
