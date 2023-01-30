@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 import easyocr
 from PIL import Image
@@ -6,10 +6,39 @@ import time
 from jinja2 import Environment, FileSystemLoader
 import os
 import imghdr
+import redis
+import secrets
 
 app = FastAPI()
+redis_conn = redis.Redis(db=2)
 reader = easyocr.Reader(["en"], gpu=False)
 start_time = time.time()
+
+fake_db = {'id': 1, 'email': 'fakeemail@example.com','password': 'password', 'token': 'secrettoken'},
+
+
+# def get_token_from_redis(email):
+#     key = f"token:{email}"
+#     token_bytes = redis_conn.get(key)
+#     if token_bytes:
+#         return token_bytes.decode()
+
+# def store_tokens_in_redis(tokens):
+#     for token in tokens:
+#         key = f"token:{token['email']}"
+#         redis_conn.set(key, token["key"])
+
+# @app.post("/auth/create_token")
+# async def create_token(email: str):
+#     key = f"token:{email}"
+#     token = secrets.token_hex(16)
+#     redis_conn.set(key, token)
+#     return {"key": token}
+
+@app.get("/profile/{user_id}")
+def get_user(user_id: int):
+    return [user for user in fake_db if user.get('id') == user_id]
+
 
 @app.post("/image/")
 async def image(file: UploadFile, x: int, y: int, width: int, height: int):
@@ -49,6 +78,6 @@ def is_valid_image(file):
 @app.get("/")
 async def main():
     env = Environment(loader=FileSystemLoader("templates"))
-    template = env.get_template("template.html")
+    template = env.get_template("main.html")
     content = template.render()
     return HTMLResponse(content=content)
