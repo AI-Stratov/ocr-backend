@@ -8,9 +8,9 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from jinja2 import Environment, FileSystemLoader
 from PIL import Image
 
-from db import User, db
-from schemas import UserCreate, UserRead, UserUpdate
-from users import auth_backend, current_active_user, fastapi_users
+from .db import User, db
+from .schemas import UserCreate, UserRead, UserUpdate
+from .users import auth_backend, current_active_user, fastapi_users
 
 app = FastAPI()
 reader = easyocr.Reader(["en"], gpu=False)
@@ -86,9 +86,9 @@ def crop_image(image_path, new_file_path, x, y, width, height):
 def is_valid_image(file):
     return imghdr.what(file) in ["jpeg", "png", "bmp", "webp"]
 
-# @app.get("/")
-# async def main():
-#     env = Environment(loader=FileSystemLoader("/templates/"))
-#     template = env.get_template("main.html")
-#     content = template.render()
-#     return HTMLResponse(content=content)
+@app.get("/")
+async def main():
+    env = Environment(loader=FileSystemLoader("templates"))
+    template = env.get_template("main.html")
+    content = template.render()
+    return HTMLResponse(content=content)

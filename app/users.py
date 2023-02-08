@@ -7,8 +7,8 @@ from fastapi_users.authentication import (AuthenticationBackend,
                                           BearerTransport, JWTStrategy)
 from fastapi_users.db import BeanieUserDatabase, ObjectIDIDMixin
 
-from db import User, get_user_db
-from settings import SECRET
+from .db import User, get_user_db
+from .settings import SECRET
 
 
 class UserManager(ObjectIDIDMixin, BaseUserManager[User, PydanticObjectId]):

@@ -4,5 +4,7 @@
 * user auth/token validation. User write email, recieve token
 * way to select croping zone
 
-`pip install -r requirements`
-`uvicorn app:app`
+# Set Up:
+note: works only with .jpg
+`pip install -r requirements.txt`  
+`$ python main.py`

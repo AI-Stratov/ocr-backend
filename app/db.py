@@ -2,7 +2,7 @@ import motor.motor_asyncio
 from beanie import PydanticObjectId
 from fastapi_users.db import BeanieBaseUser, BeanieUserDatabase
 
-from settings import DATABASE_URL
+from .settings import DATABASE_URL
 
 client = motor.motor_asyncio.AsyncIOMotorClient(
     DATABASE_URL, uuidRepresentation="standard"
