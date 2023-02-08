@@ -5,4 +5,4 @@
 * way to select croping zone
 
 `pip install -r requirements`
-`uvicorn main:app`
+`uvicorn app:app`
