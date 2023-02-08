@@ -1,50 +1,61 @@
-from fastapi import FastAPI, HTTPException, UploadFile, Depends
-from fastapi.responses import HTMLResponse, JSONResponse
-
-from PIL import Image
-import time
-from jinja2 import Environment, FileSystemLoader
 import os
+from beanie import init_beanie
+from fastapi import Depends, FastAPI, UploadFile
+from fastapi.responses import HTMLResponse, JSONResponse
+import easyocr
 import imghdr
-import motor.motor_asyncio
-from beanie import PydanticObjectId, init_beanie
-from fastapi_users.db import BeanieBaseUser, BeanieUserDatabase
-from fastapi_users.authentication import BearerTransport
-from fastapi_users_db_beanie.access_token import (
-    BeanieAccessTokenDatabase,
-    BeanieBaseAccessToken,
+from jinja2 import Environment, FileSystemLoader
+from app.db import User, db
+from PIL import Image
+from app.schemas import UserCreate, UserRead, UserUpdate
+from app.users import auth_backend, current_active_user, fastapi_users
+
+app = FastAPI()
+reader = easyocr.Reader(["en"], gpu=False)
+
+
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
 )
-from fastapi_users.authentication.strategy.db import AccessTokenDatabase, DatabaseStrategy
+app.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
+app.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+app.include_router(
+    fastapi_users.get_verify_router(UserRead),
+    prefix="/auth",
+    tags=["auth"],
+)
+app.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/users",
+    tags=["users"],
+)
 
-async def get_access_token_db():  
-    yield BeanieAccessTokenDatabase(AccessToken)
 
-
-def get_database_strategy(
-    access_token_db: AccessTokenDatabase[AccessToken] = Depends(get_access_token_db),
-) -> DatabaseStrategy:
-    return DatabaseStrategy(access_token_db)
+@app.get("/authenticated-route")
+async def authenticated_route(user: User = Depends(current_active_user)):
+    return {"message": f"Hello {user.email}!"}
 
 
 @app.on_event("startup")
 async def on_startup():
     await init_beanie(
-        database=db,  
+        database=db,
         document_models=[
-            User,  
+            User,
         ],
     )
 
 
-@app.get("/profile/{user_id}")
-def get_user(user_id: int):
-    return [user for user in fake_db if user.get('id') == user_id]
-
-
 @app.post("/image/")
 async def image(file: UploadFile, x: int, y: int, width: int, height: int):
-    global start_time
-    start_time = time.time()
     if not is_valid_image(file.file):
         return JSONResponse(content={"error": "The file you uploaded is not an image"})
     image_bytes = await file.read()
@@ -63,9 +74,6 @@ def process_images(x: int, y: int, width: int, height: int, image_path: str) -> 
     text = reader.readtext(f"prepared_data\image.jpg", detail=0)
     os.remove("prepared_data\image.jpg")
     os.remove("saved_data\image.jpg")
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print("Elapsed time: ", elapsed_time)
     return text
 
 def crop_image(image_path, new_file_path, x, y, width, height):
